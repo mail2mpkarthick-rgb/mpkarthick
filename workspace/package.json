@@ -1,0 +1,8 @@
+{
+  "name": "g-automation-ai-sandbox",
+  "version": "1.0.0",
+  "dependencies": {
+    "@playwright/test": "^1.62.0",
+    "dotenv": "^17.4.2"
+  }
+}

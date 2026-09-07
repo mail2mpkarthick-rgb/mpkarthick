@@ -1,0 +1,54 @@
+{
+  "pages": {
+    "test_672bf2dc_page": {
+      "locators": {},
+      "page_url": "",
+      "updated": "2026-07-27T15:39:24.194504"
+    },
+    "test_ada2977a_page": {
+      "locators": {},
+      "page_url": "",
+      "updated": "2026-07-28T12:30:49.021563"
+    },
+    "test_92c2d331_page": {
+      "locators": {},
+      "page_url": "",
+      "updated": "2026-07-28T13:34:18.871187"
+    },
+    "test_70606cab_page": {
+      "locators": {},
+      "page_url": "",
+      "updated": "2026-07-28T18:06:47.435888"
+    },
+    "test_cf8bbdb8_page": {
+      "locators": {},
+      "page_url": "",
+      "updated": "2026-07-29T14:33:58.627491"
+    },
+    "test_3856ebe5_page": {
+      "locators": {},
+      "page_url": "",
+      "updated": "2026-07-29T14:52:47.612279"
+    },
+    "test_48e87e00_page": {
+      "locators": {},
+      "page_url": "",
+      "updated": "2026-07-29T16:43:39.262087"
+    },
+    "test_203130ed_page": {
+      "locators": {
+        "url": "https://dev.ges.store/"
+      },
+      "page_url": "",
+      "updated": "2026-09-04T13:25:28.384414"
+    }
+  },
+  "locators": {
+    "https://dev.ges.store/": [
+      {
+        "page": "test_203130ed_page",
+        "name": "url"
+      }
+    ]
+  }
+}

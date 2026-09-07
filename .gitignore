@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+*.db
+
+# Node
+node_modules/
+package-lock.json
+
+# Workspace
+workspace/test-results/
+workspace/reports/
+workspace/_dom_inspect.js
+
+# Uploads
+uploads/
+
+# Environment
+.env
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,21 @@
+# Web Gateway & API Infrastructure
+fastapi>=0.115.0
+uvicorn>=0.30.1
+pydantic>=2.12.0
+python-multipart>=0.0.12
+requests>=2.32.3
+
+# AI Agent & Databases
+google-genai>=1.0.0
+sqlalchemy>=2.0.30
+
+# Environment Variables
+python-dotenv>=1.0.1
+
+# Document Data Extractors
+docx2txt==0.8
+pypdf>=4.2.0
+
+# Image & Screenshot Analytics
+pillow>=11.0.0
+pytesseract>=0.3.10

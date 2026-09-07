@@ -1,0 +1,14 @@
+INFO:     Will watch for changes in these directories: ['d:\\g_automation_ai']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [12128] using StatReload
+INFO:     Started server process [12036]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:53384 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52889 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55909 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61017 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61621 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61621 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63615 - "GET /analytics/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57072 - "POST /workflow/from-prompt HTTP/1.1" 200 OK

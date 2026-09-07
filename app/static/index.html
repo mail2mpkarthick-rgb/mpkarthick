@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G_Automation_AI v2</title>
+<style>
+:root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #007bff;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --text-light: #666;
+    --border: #e0e0e0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.navbar{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#eee;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.navbar h1{font-size:1.2em;font-weight:600}
+.navbar .version{font-size:0.7em;color:#a8d8ea;margin-left:8px}
+.navbar .status{font-size:0.75em;color:#a8d8ea;display:flex;align-items:center;gap:6px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block}
+.status-dot.offline{background:var(--danger)}
+.status-dot.unknown{background:var(--warning)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.tabs{display:flex;gap:2px;margin-bottom:20px;background:#fff;border-radius:10px;padding:4px;border:1px solid var(--border)}
+.tab{padding:10px 20px;cursor:pointer;border-radius:6px;font-size:0.85em;font-weight:500;transition:all 0.2s;border:none;background:transparent;color:var(--text)}
+.tab.active{background:var(--accent);color:#fff}
+.tab:hover:not(.active){background:#e8f0fe}
+.panel{display:none}
+.panel.active{display:block}
+.card{background:var(--card);border-radius:10px;padding:20px;margin-bottom:16px;border:1px solid var(--border)}
+.card h3{font-size:1em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}
+.form-group{margin-bottom:14px}
+.form-group label{font-size:0.85em;font-weight:500;display:block;margin-bottom:4px;color:var(--text-light)}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:0.9em;transition:border-color 0.2s;font-family:inherit}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,123,255,0.15)}
+.form-group textarea{min-height:100px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.btn{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:0.85em;font-weight:500;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#0056b3}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#1e7e34}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#c82333}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:#f5f5f5}
+.btn-sm{padding:6px 12px;font-size:0.8em}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.steps{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:0.8em;background:#e9ecef;color:#666}
+.step.active{background:var(--accent);color:#fff}
+.step.done{background:var(--success);color:#fff}
+.step.failed{background:var(--danger);color:#fff}
+.test-case{border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;background:#fafafa}
+.test-case .tc-header{display:flex;justify-content:space-between;margin-bottom:6px}
+.test-case .tc-title{font-weight:600;font-size:0.9em}
+.test-case .tc-desc{font-size:0.82em;color:var(--text-light);margin-bottom:6px}
+.test-case .tc-steps{font-size:0.8em;padding-left:16px;margin-bottom:4px}
+.test-case .tc-expected{font-size:0.8em;color:var(--success)}
+.spinner{width:18px;height:18px;border:2px solid #fff;border-top:2px solid transparent;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mt-8{margin-top:8px}
+.mt-16{margin-top:16px}
+.mb-8{margin-bottom:8px}
+.mb-16{margin-bottom:16px}
+.flex{display:flex;gap:8px;align-items:center}
+.flex-wrap{flex-wrap:wrap}
+.gap-4{gap:4px}
+.gap-8{gap:8px}
+.gap-12{gap:12px}
+.text-sm{font-size:0.82em}
+.text-muted{color:var(--text-light)}
+.text-success{color:var(--success)}
+.text-danger{color:var(--danger)}
+.text-center{text-align:center}
+.code-block{background:#1a1a2e;color:#a8d8ea;padding:12px;border-radius:6px;font-size:0.82em;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto}
+.alert{padding:12px;border-radius:6px;margin-bottom:12px;font-size:0.85em}
+.alert-info{background:#e8f0fe;border:1px solid #b8daff;color:#004085}
+.alert-success{background:#d4edda;border:1px solid #c3e6cb;color:#155724}
+.alert-danger{background:#f8d7da;border:1px solid #f5c6cb;color:#721c24}
+.alert-warning{background:#fff3cd;border:1px solid #ffeeba;color:#856404}
+.hidden{display:none !important}
+.w-full{width:100%}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.loader-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity 0.3s}
+.loader-overlay.hidden{opacity:0;pointer-events:none}
+.loader-modal{background:#fff;border-radius:20px;padding:50px 60px;text-align:center;box-shadow:0 25px 80px rgba(0,0,0,0.35);max-width:420px;width:90%}
+.loader-spinner{width:56px;height:56px;border:4px solid #e0e0e0;border-top:4px solid var(--accent);border-radius:50%;animation:loaderSpin 0.8s linear infinite;margin:0 auto 20px}
+@keyframes loaderSpin{to{transform:rotate(360deg)}}
+.loader-modal h2{font-size:1.2em;color:var(--text);margin-bottom:8px}
+.loader-modal p{font-size:0.85em;color:var(--text-light);margin-bottom:4px}
+.loader-modal .loader-sub{font-size:0.75em;color:#999}
+.data-mode-options{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.data-mode-btn{padding:8px 20px;border:2px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.85em;font-weight:500;transition:all 0.2s;background:#fff;color:var(--text)}
+.data-mode-btn:hover{border-color:var(--accent);background:#e8f0fe}
+.data-mode-btn.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.manual-tc-item{border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;background:#fafafa;position:relative}
+.manual-tc-item .tc-remove{position:absolute;top:10px;right:10px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:14px;line-height:26px;text-align:center}
+.manual-tc-item .form-group{margin-bottom:8px}
+.manual-tc-item label{font-size:0.8em;font-weight:500;color:var(--text-light)}
+.data-config-section{border-top:2px dashed #e0e0e0;padding-top:16px;margin-top:8px}
+.btn-loading{position:relative;pointer-events:none;opacity:0.7;transform:scale(0.98)}
+.btn-loading::after{content:'';position:absolute;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top:2px solid #fff;border-radius:50%;animation:btnSpin 0.6s linear infinite;right:12px;top:50%;margin-top:-9px}
+@keyframes btnSpin{to{transform:rotate(360deg)}}
+.data-file-upload{border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:10px}
+.data-file-upload:hover{border-color:var(--accent);background:#f8faff}
+.data-file-upload.has-file{border-color:var(--success);background:#f0fff4}
+@media(max-width:768px){.form-row{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <div><h1>G_Automation_AI <span class="version">v2.0</span></h1></div>
+    <div class="status"><span class="status-dot unknown" id="statusDot"></span> <span id="statusLabel">Checking AI backend...</span></div>
+</div>
+
+<div id="loaderOverlay" class="loader-overlay hidden">
+    <div class="loader-modal">
+        <div class="loader-spinner"></div>
+        <h2 id="loaderTitle">Processing...</h2>
+        <p id="loaderMessage">Please wait while we process your request.</p>
+        <p class="loader-sub" id="loaderSub">This may take a moment</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="steps" id="stepsTracker">
+        <div class="step active" data-step="1">1. Input</div>
+        <div class="step" data-step="2">2. Review Tests</div>
+        <div class="step" data-step="3">3. Generate Scripts</div>
+        <div class="step" data-step="4">4. Execute & Heal</div>
+        <div class="step" data-step="5">5. Report</div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('prompt')">Prompt</button>
+        <button class="tab" onclick="switchTab('document')">Upload Document</button>
+        <button class="tab" onclick="switchTab('history')">History</button>
+    </div>
+
+    <div id="tab-prompt" class="panel active">
+        <div class="card">
+            <h3>Enter Test Scenario</h3>
+            <div class="form-group">
+                <label>Plain-English Test Scenario</label>
+                <textarea id="promptInput" rows="5" placeholder="e.g., Test the login page of dev.ges.store with valid and invalid credentials..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Target Environment</label>
+                    <select id="promptEnv">
+                        <option value="dev">dev</option>
+                        <option value="uat">uat</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Retry Cap</label>
+                    <input type="number" id="promptRetry" value="3" min="1" max="5" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Attach Screenshots (optional)</label>
+                <input type="file" id="promptImages" multiple accept=".png,.jpg,.jpeg" />
+            </div>
+        </div>
+
+        <div class="card" id="promptDataConfig">
+            <h3>Data Configuration</h3>
+            <div class="data-mode-options">
+                <button class="data-mode-btn active" data-mode="inline" onclick="setDataMode('inline', 'prompt')">Inline</button>
+                <button class="data-mode-btn" data-mode="data-driven" onclick="setDataMode('data-driven', 'prompt')">Data-driven</button>
+                <button class="data-mode-btn" data-mode="browser" onclick="setDataMode('browser', 'prompt')">Browser Mode</button>
+            </div>
+
+            <div id="promptDataModeInline" class="data-config-section">
+                <p class="text-sm text-muted">Test data extracted from your prompt. AI generates test cases automatically.</p>
+            </div>
+
+            <div id="promptDataModeDriven" class="data-config-section hidden">
+                <div class="form-group">
+                    <label>Upload Data File (Excel/CSV)</label>
+                    <input type="file" id="promptDataFile" accept=".xlsx,.xls,.csv" />
+                </div>
+            </div>
+
+            <div id="promptDataModeBrowser" class="data-config-section hidden">
+                <p class="text-sm text-muted mb-8">Manually create test cases.</p>
+                <div id="promptManualTCList"></div>
+                <button class="btn btn-outline btn-sm mt-8" onclick="addManualTestCase('prompt')">+ Add Test Case</button>
+                <button class="btn btn-success w-full mt-8 hidden" onclick="submitManualTestCases('prompt')" id="promptManualSubmitBtn">Generate Playwright Scripts from Manual Tests</button>
+            </div>
+
+            <button class="btn btn-primary w-full mt-8" onclick="submitPrompt()" id="promptBtn">Generate Test Cases with AI</button>
+        </div>
+    </div>
+
+    <div id="tab-document" class="panel">
+        <div class="card">
+            <h3>Upload Document</h3>
+            <div class="form-group">
+                <label>Upload File (Word, PDF, TXT, CSV)</label>
+                <input type="file" id="docFile" accept=".docx,.pdf,.txt,.csv" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Target Environment</label>
+                    <select id="docEnv">
+                        <option value="dev">dev</option>
+                        <option value="uat">uat</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Retry Cap</label>
+                    <input type="number" id="docRetry" value="3" min="1" max="5" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" id="docDomInspect" /> Enable DOM Inspection</label>
+            </div>
+            <div class="form-group">
+                <label>Attach Screenshots (optional)</label>
+                <input type="file" id="docImages" multiple accept=".png,.jpg,.jpeg" />
+            </div>
+        </div>
+
+        <div class="card" id="docDataConfig">
+            <h3>Data Configuration</h3>
+            <div class="data-mode-options">
+                <button class="data-mode-btn active" data-mode="inline" onclick="setDataMode('inline', 'doc')">Inline</button>
+                <button class="data-mode-btn" data-mode="data-driven" onclick="setDataMode('data-driven', 'doc')">Data-driven</button>
+                <button class="data-mode-btn" data-mode="browser" onclick="setDataMode('browser', 'doc')">Browser Mode</button>
+            </div>
+
+            <div id="docDataModeInline" class="data-config-section">
+                <p class="text-sm text-muted">Test data extracted from your document. AI generates test cases automatically.</p>
+            </div>
+
+            <div id="docDataModeDriven" class="data-config-section hidden">
+                <div class="form-group">
+                    <label>Upload Data File (Excel/CSV)</label>
+                    <input type="file" id="docDataFile" accept=".xlsx,.xls,.csv" />
+                </div>
+            </div>
+
+            <div id="docDataModeBrowser" class="data-config-section hidden">
+                <p class="text-sm text-muted mb-8">Manually create test cases.</p>
+                <div id="docManualTCList"></div>
+                <button class="btn btn-outline btn-sm mt-8" onclick="addManualTestCase('doc')">+ Add Test Case</button>
+                <button class="btn btn-success w-full mt-8 hidden" onclick="submitManualTestCases('doc')" id="docManualSubmitBtn">Generate Playwright Scripts from Manual Tests</button>
+            </div>
+
+            <button class="btn btn-primary w-full mt-8" onclick="submitDocument()" id="docBtn">Generate Test Cases with AI</button>
+        </div>
+    </div>
+
+    <div id="tab-history" class="panel">
+        <div class="card">
+            <h3>Workflow History</h3>
+            <div id="historyList">Loading...</div>
+        </div>
+    </div>
+
+    <div id="resultsArea"></div>
+</div>
+
+<script>
+let currentSessionId = null;
+let currentTestName = null;
+let manualTCCounter = { prompt: 0, doc: 0 };
+let currentDataModes = { prompt: 'inline', doc: 'inline' };
+
+function showLoader(title, message, sub) {
+    const overlay = document.getElementById('loaderOverlay');
+    if (title) document.getElementById('loaderTitle').textContent = title;
+    if (message) document.getElementById('loaderMessage').textContent = message;
+    if (sub) document.getElementById('loaderSub').textContent = sub;
+    overlay.classList.remove('hidden');
+}
+
+function hideLoader() {
+    document.getElementById('loaderOverlay').classList.add('hidden');
+}
+
+function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.tab[onclick*="${name}"]`).classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'history') loadHistory();
+}
+
+function updateStep(step, status) {
+    document.querySelectorAll('.step').forEach((s, i) => {
+        s.classList.remove('active', 'done', 'failed');
+        if (i + 1 < step) s.classList.add('done');
+        else if (i + 1 === step) s.classList.add(status === 'failed' ? 'failed' : 'active');
+    });
+}
+
+function showResults(html) {
+    document.getElementById('resultsArea').innerHTML = html;
+}
+
+function getActiveDataMode(source) {
+    return currentDataModes[source] || 'inline';
+}
+
+function setDataMode(mode, source) {
+    currentDataModes[source] = mode;
+    const container = document.getElementById(source === 'prompt' ? 'promptDataConfig' : 'docDataConfig');
+    container.querySelectorAll('.data-mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+    const prefix = source;
+    document.getElementById(prefix + 'DataModeInline').classList.toggle('hidden', mode !== 'inline');
+    document.getElementById(prefix + 'DataModeDriven').classList.toggle('hidden', mode !== 'data-driven');
+    document.getElementById(prefix + 'DataModeBrowser').classList.toggle('hidden', mode !== 'browser');
+    const aiBtn = document.getElementById(prefix === 'prompt' ? 'promptBtn' : 'docBtn');
+    const manualBtn = document.getElementById(prefix === 'prompt' ? 'promptManualSubmitBtn' : 'docManualSubmitBtn');
+    if (mode === 'browser') {
+        aiBtn.classList.add('hidden');
+        manualBtn.classList.remove('hidden');
+    } else {
+        aiBtn.classList.remove('hidden');
+        manualBtn.classList.add('hidden');
+    }
+}
+
+function addManualTestCase(source) {
+    manualTCCounter[source]++;
+    const id = manualTCCounter[source];
+    const list = document.getElementById(source + 'ManualTCList');
+    const item = document.createElement('div');
+    item.className = 'manual-tc-item';
+    item.id = 'manual-tc-' + source + '-' + id;
+    item.innerHTML = 
+        '<button class="tc-remove" onclick="removeManualTestCase(' + id + ',\'' + source + '\')">x</button>' +
+        '<div class="form-group"><label>Title</label><input type="text" placeholder="e.g., Verify login" class="manual-tc-title" /></div>' +
+        '<div class="form-group"><label>Description</label><textarea rows="2" placeholder="Describe the test case..." class="manual-tc-desc"></textarea></div>' +
+        '<div class="form-group"><label>Steps (one per line)</label><textarea rows="3" placeholder="Step 1: Do something\nStep 2: Check something" class="manual-tc-steps"></textarea></div>' +
+        '<div class="form-group"><label>Expected Result</label><input type="text" placeholder="e.g., User is logged in" class="manual-tc-expected" /></div>';
+    list.appendChild(item);
+    document.getElementById(source + 'ManualSubmitBtn').disabled = false;
+}
+
+function removeManualTestCase(id, source) {
+    const item = document.getElementById('manual-tc-' + source + '-' + id);
+    if (item) item.remove();
+}
+
+async function submitPrompt() {
+    const input = document.getElementById('promptInput').value;
+    if (!input.trim()) {
+        showResults('<div class="alert alert-warning">Please enter a test scenario.</div>');
+        return;
+    }
+    showLoader('Generating Test Cases', 'AI is analyzing your prompt to create test cases...', 'Using Gemini AI');
+
+    const formData = new FormData();
+    formData.append('prompt', input);
+    formData.append('environment', document.getElementById('promptEnv').value);
+    formData.append('data_mode', getActiveDataMode('prompt'));
+    formData.append('retry_cap', document.getElementById('promptRetry').value);
+    formData.append('browser_mode', 'headless');
+    formData.append('dom_inspection', 'false');
+
+    const images = document.getElementById('promptImages').files;
+    for (const img of images) formData.append('images', img);
+
+    updateStep(2, 'active');
+
+    try {
+        const res = await fetch('/workflow/from-prompt', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.detail) {
+            showResults('<div class="alert alert-danger">Error: ' + data.detail + '</div>');
+            hideLoader();
+            return;
+        }
+        currentSessionId = data.session_id;
+        hideLoader();
+        displayTestCases(data);
+    } catch (e) {
+        hideLoader();
+        showResults('<div class="alert alert-danger">Error: ' + e.message + '</div>');
+    }
+}
+
+async function submitDocument() {
+    const fileInput = document.getElementById('docFile');
+    if (!fileInput.files.length) {
+        showResults('<div class="alert alert-warning">Please select a file to upload.</div>');
+        return;
+    }
+
+    showLoader('Processing Document', 'Parsing and analyzing your document...', 'Using Gemini AI to extract text and generate test cases');
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('environment', document.getElementById('docEnv').value);
+    formData.append('data_mode', getActiveDataMode('doc'));
+    formData.append('retry_cap', document.getElementById('docRetry').value);
+    formData.append('browser_mode', 'headless');
+    formData.append('dom_inspection', document.getElementById('docDomInspect').checked ? 'true' : 'false');
+
+    const images = document.getElementById('docImages').files;
+    for (const img of images) formData.append('images', img);
+
+    updateStep(2, 'active');
+
+    try {
+        const res = await fetch('/workflow/from-document', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.detail) {
+            showResults('<div class="alert alert-danger">Error: ' + data.detail + '</div>');
+            hideLoader();
+            return;
+        }
+        currentSessionId = data.session_id;
+        hideLoader();
+        displayTestCases(data);
+    } catch (e) {
+        hideLoader();
+        showResults('<div class="alert alert-danger">Error: ' + e.message + '</div>');
+    }
+}
+
+function displayTestCases(data) {
+    const tests = data.manual_test_cases;
+    if (!tests || !tests.length) {
+        showResults('<div class="alert alert-danger">No test cases were generated. Please try again.</div>');
+        return;
+    }
+
+    let html = '<div class="card"><h3>Generated Manual Test Cases</h3>';
+    html += '<div class="alert alert-info mb-16">Environment: <strong>' + (data.environment || 'N/A') + '</strong> | Data Mode: <strong>' + (data.data_mode || 'N/A') + '</strong> | Retry Cap: <strong>' + (data.retry_cap || 'N/A') + '</strong></div>';
+
+    if (data.image_warnings && data.image_warnings.length) {
+        html += '<div class="alert alert-warning mb-16"><strong>Image Warnings:</strong><ul>';
+        data.image_warnings.forEach(function(w) { html += '<li>' + w + '</li>'; });
+        html += '</ul></div>';
+    }
+
+    html += '<div id="testCasesList">';
+    tests.forEach(function(tc, i) {
+        html += '<div class="test-case">' +
+            '<div class="tc-header"><span class="tc-title">' + tc.id + ': ' + tc.title + '</span><span class="text-sm text-muted">#' + (i+1) + '</span></div>' +
+            '<div class="tc-desc">' + (tc.description || '') + '</div>' +
+            '<div class="tc-steps"><strong>Steps:</strong><ol>';
+        if (tc.steps) tc.steps.forEach(function(s) { html += '<li>' + s + '</li>'; });
+        html += '</ol></div>' +
+            '<div class="tc-expected"><strong>Expected:</strong> ' + (tc.expected || '') + '</div>' +
+            '</div>';
+    });
+    html += '</div>';
+
+    html += '<div class="flex gap-8 mt-16">' +
+        '<button class="btn btn-success" onclick="confirmTestCases()">Confirm & Generate Scripts</button>' +
+        '<button class="btn btn-outline" onclick="editTestCases()">Edit Test Cases</button>' +
+            '<button class="btn btn-outline" onclick="startOver()">Start Over</button>' +
+        '</div></div>';
+
+    showResults(html);
+}
+
+async function confirmTestCases() {
+    if (!currentSessionId) return;
+    showLoader('Generating POM Scripts', 'AI is creating Playwright page objects and test scripts...', 'Using Gemini AI to analyze test cases and generate code');
+    updateStep(3, 'active');
+
+    const formData = new FormData();
+    formData.append('session_id', currentSessionId);
+
+    try {
+        const res = await fetch('/workflow/confirm', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.detail) {
+            showResults('<div class="alert alert-danger">Script generation failed: ' + data.detail + '</div>');
+            hideLoader();
+            return;
+        }
+        currentTestName = data.test_name;
+        hideLoader();
+        displayScripts(data);
+    } catch (e) {
+        hideLoader();
+        showResults('<div class="alert alert-danger">Script generation failed: ' + e.message + '</div>');
+    }
+}
+
+function displayScripts(data) {
+    let html = '<div class="card"><h3>Generated Playwright POM Scripts</h3>';
+
+    html += '<div class="grid-2 mb-16">';
+    if (data.page_code) {
+        html += '<div><label class="text-sm text-muted">Page Object</label><div class="code-block">' + escapeHtml(data.page_code) + '</div></div>';
+    }
+    if (data.test_code) {
+        html += '<div><label class="text-sm text-muted">Test Spec</label><div class="code-block">' + escapeHtml(data.test_code) + '</div></div>';
+    }
+    html += '</div>';
+
+    html += '<div class="flex gap-8">' +
+        '<button class="btn btn-success" onclick="executeTests()">Execute Tests</button>' +
+        '<button class="btn btn-outline" onclick="downloadScript()">Download Script</button>' +
+        '<button class="btn btn-outline" onclick="downloadPageObject()">Download Page Object</button>' +
+        '</div></div>';
+
+    showResults(html);
+    updateStep(3, 'done');
+}
+
+async function executeTests() {
+    if (!currentSessionId) return;
+    showLoader('Executing Tests', 'Running Playwright tests on the target environment...', 'This may take a few minutes');
+    updateStep(4, 'active');
+
+    const formData = new FormData();
+    formData.append('session_id', currentSessionId);
+
+    try {
+        const res = await fetch('/workflow/execute', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.detail) {
+            showResults('<div class="alert alert-danger">Execution failed: ' + data.detail + '</div>');
+            hideLoader();
+            return;
+        }
+        hideLoader();
+        displayResults(data);
+    } catch (e) {
+        hideLoader();
+        showResults('<div class="alert alert-danger">Execution failed: ' + e.message + '</div>');
+    }
+}
+
+function displayResults(data) {
+    let html = '<div class="card"><h3>Test Execution Results</h3>';
+
+    const status = data.status;
+    if (status === 'passed') {
+        html += '<div class="alert alert-success"><strong>PASSED</strong> All tests passed successfully.</div>';
+        updateStep(4, 'done');
+    } else if (status === 'healed_and_passed') {
+        html += '<div class="alert alert-success"><strong>HEALED & PASSED</strong> ' + (data.message || 'Tests healed and passed.') + '</div>';
+        updateStep(4, 'done');
+    } else if (status === 'application_defect' || status === 'environment_issue') {
+        html += '<div class="alert alert-danger"><strong>' + status.toUpperCase() + '</strong><br>' + (data.message || 'Auto-fix skipped.') + '</div>';
+        updateStep(4, 'failed');
+    } else if (status === 'failed_needs_review') {
+        html += '<div class="alert alert-danger"><strong>NEEDS MANUAL REVIEW</strong><br>' + (data.message || 'Test failed after all attempts.') + '</div>';
+        updateStep(4, 'failed');
+    } else {
+        html += '<div class="alert alert-warning"><strong>' + status + '</strong><br>' + (data.message || '') + '</div>';
+    }
+
+    if (data.healing_diffs && data.healing_diffs.length) {
+        html += '<h3 class="mt-16">Auto-Fix Diff Log</h3>';
+        data.healing_diffs.forEach(function(d) {
+            const icon = d.success ? 'OK' : 'FAIL';
+            const color = d.success ? 'var(--success)' : 'var(--danger)';
+            html += '<div style="background:#f8f9fa;border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:8px;font-size:0.85em">' +
+                '<p><strong>Attempt #' + d.attempt_number + '</strong> - Type: <code>' + (d.failure_type || '') + '</code> - <span style="color:' + color + '">' + icon + '</span></p>' +
+                '<div class="code-block" style="max-height:150px">' + escapeHtml(d.diff_summary || 'No diff summary') + '</div></div>';
+        });
+    }
+
+    if (data.report_path) {
+        html += '<div class="flex gap-8 mt-16">' +
+            '<a href="/workflow/download/' + currentSessionId + '/report" class="btn btn-primary" target="_blank">Download HTML Report</a>' +
+            '<a href="/workflow/download/' + currentSessionId + '/csv_report" class="btn btn-outline" target="_blank">Download CSV Report</a>' +
+            '<button class="btn btn-outline" onclick="startOver()">New Test</button></div>';
+    } else {
+        html += '<div class="flex gap-8 mt-16"><button class="btn btn-outline" onclick="startOver()">New Test</button></div>';
+    }
+
+    html += '</div>';
+    showResults(html);
+    updateStep(5, 'active');
+}
+
+function downloadScript() {
+    if (currentSessionId) window.open('/workflow/download/' + currentSessionId + '/script');
+}
+function downloadPageObject() {
+    if (currentSessionId) window.open('/workflow/download/' + currentSessionId + '/page_object');
+}
+
+async function submitManualTestCases(source) {
+    const list = document.getElementById(source + 'ManualTCList');
+    const items = list.querySelectorAll('.manual-tc-item');
+    const tests = [];
+    items.forEach(function(item) {
+        tests.push({
+            id: 'TC_' + (tests.length + 1),
+            title: item.querySelector('.manual-tc-title').value,
+            description: item.querySelector('.manual-tc-desc').value,
+            steps: item.querySelector('.manual-tc-steps').value.split('\n').filter(function(s) { return s.trim(); }),
+            expected: item.querySelector('.manual-tc-expected').value
+        });
+    });
+    if (!tests.length) {
+        showResults('<div class="alert alert-danger">Please add at least one test case.</div>');
+        return;
+    }
+
+    showLoader('Generating Playwright Scripts', 'Using Gemini AI to create POM scripts from your manual test cases...', 'This may take a moment');
+    updateStep(3, 'active');
+
+    try {
+        const formData = new FormData();
+        formData.append('prompt', 'Manual test cases from Browser Mode');
+        formData.append('environment', source === 'prompt' ? document.getElementById('promptEnv').value : document.getElementById('docEnv').value);
+        formData.append('data_mode', 'browser');
+        formData.append('retry_cap', source === 'prompt' ? document.getElementById('promptRetry').value : document.getElementById('docRetry').value);
+        formData.append('browser_mode', 'headless');
+        formData.append('dom_inspection', 'false');
+
+        const res = await fetch('/workflow/from-prompt', { method: 'POST', body: formData });
+        const data = await res.json();
+        currentSessionId = data.session_id;
+
+        const confirmData = new FormData();
+        confirmData.append('session_id', currentSessionId);
+        confirmData.append('edited_test_cases', JSON.stringify(tests));
+
+        const confirmRes = await fetch('/workflow/confirm', { method: 'POST', body: confirmData });
+        const confirmResult = await confirmRes.json();
+        currentTestName = confirmResult.test_name;
+        hideLoader();
+        displayScripts(confirmResult);
+    } catch (e) {
+        hideLoader();
+        showResults('<div class="alert alert-danger">Script generation failed: ' + e.message + '</div>');
+    }
+}
+
+
+function editTestCases() {
+    const list = document.getElementById('testCasesList');
+    if (!list) return;
+    const tests = list.querySelectorAll('.test-case');
+    tests.forEach(function(tc) {
+        const title = tc.querySelector('.tc-title');
+        const desc = tc.querySelector('.tc-desc');
+        if (title && !title.querySelector('input')) {
+            const titleText = title.textContent.split(': ').slice(1).join(': ');
+            title.innerHTML = '<input type="text" value="' + escapeHtml(titleText) + '" style="width:90%;padding:4px;font-size:0.9em" class="edit-title" />';
+        }
+        if (desc && !desc.querySelector('textarea')) {
+            const descText = desc.textContent;
+            desc.innerHTML = '<textarea style="width:100%;padding:4px;font-size:0.82em" rows="2" class="edit-desc">' + escapeHtml(descText) + '</textarea>';
+        }
+    });
+}
+
+async function loadHistory() {
+    const div = document.getElementById('historyList');
+    try {
+        const res = await fetch('/analytics/history');
+        const data = await res.json();
+        if (!data || !data.length) {
+            div.innerHTML = '<p class="text-muted text-center">No workflow history yet.</p>';
+            return;
+        }
+        let html = '<table style="width:100%;border-collapse:collapse;font-size:0.85em">';
+        html += '<tr style="background:#f5f5f5"><th style="padding:8px;text-align:left">Test</th><th style="padding:8px;text-align:left">Error</th><th style="padding:8px;text-align:left">Time</th></tr>';
+        data.forEach(function(r) {
+            html += '<tr style="border-bottom:1px solid var(--border)">' +
+                '<td style="padding:8px">' + (r.test_name || 'N/A') + '</td>' +
+                '<td style="padding:8px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ((r.error_signature || '').substring(0, 80)) + '</td>' +
+                '<td style="padding:8px">' + (r.timestamp ? new Date(r.timestamp).toLocaleString() : 'N/A') + '</td></tr>';
+        });
+        html += '</table>';
+        div.innerHTML = html;
+    } catch (e) {
+        div.innerHTML = '<p class="text-danger">Error loading history: ' + e.message + '</p>';
+    }
+}
+
+function startOver() {
+    currentSessionId = null;
+    currentTestName = null;
+    document.getElementById('resultsArea').innerHTML = '';
+    document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active', 'done', 'failed'); });
+    document.querySelector('.step').classList.add('active');
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/&/g, '&amp;').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '&#039;');
+}
+
+async function checkBackendStatus() {
+    const dot = document.getElementById('statusDot');
+    const label = document.getElementById('statusLabel');
+    try {
+        const res = await fetch('/health');
+        if (!res.ok) throw new Error('not ok');
+        const data = await res.json();
+        const model = data.model || data.backend || 'Gemini AI';
+        dot.className = 'status-dot';
+        label.textContent = model;
+    } catch (e) {
+        dot.className = 'status-dot offline';
+        label.textContent = 'Backend unreachable';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', checkBackendStatus);
+</script>
+</body>
+</html>
