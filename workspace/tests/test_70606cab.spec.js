@@ -20,7 +20,7 @@ test.describe('Security and Navigation Tests', () => {
     await secureAccessPage.navigateToHomePage();
     await secureAccessPage.enterSecureAccessPassword(process.env.SECURE_PASSWORD);
 
-    expect(await showSearchPage.isSecureAccessPageDisplayed()).toBe(false);
+    await expect(secureAccessPage.secureAccessHeading).toBeHidden();
   });
 
   test('TC_2: Invalid Password Test', async () => {

@@ -41,12 +41,23 @@
       },
       "page_url": "",
       "updated": "2026-09-04T13:25:28.384414"
+    },
+    "test_43a0dbe2adf4_page": {
+      "locators": {
+        "url": "https://dev.ges.store/"
+      },
+      "page_url": "",
+      "updated": "2026-09-07T13:28:07.985456"
     }
   },
   "locators": {
     "https://dev.ges.store/": [
       {
         "page": "test_203130ed_page",
+        "name": "url"
+      },
+      {
+        "page": "test_43a0dbe2adf4_page",
         "name": "url"
       }
     ]
